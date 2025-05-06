@@ -1,33 +1,31 @@
-import { HookBuilder } from '~core/builder'
 import type { Hook } from '~types/hooks'
 
 /**
- * Creates a typed collection of plugin hooks using a builder pattern.
+ * Creates a collection of typed plugin hooks using a declarative factory pattern.
  *
- * This utility simplifies the creation and registration of custom hooks
- * (e.g., sequence, concurrent, pipeline, race, emit, etc.) for plugin systems
- * or extensible architectures.
+ * This function allows you to define custom hooks by directly instantiating them
+ * using factory functions like `sequence()`, `concurrent()`, `pipeline()`, etc.
  *
- * @template Hooks - A record where each key represents the name of a hook,
- *                   and the value is a typed Hook instance.
+ * @template Hooks - An object where each key is the name of a hook, and the value is a Hook instance.
  *
- * @param factory - A function that receives a `HookBuilder` instance and
- *                  returns an object containing named hooks.
+ * @param hooks - An object mapping hook names to hook instances (e.g., created with `sequence()`).
  *
- * @returns The resulting object containing the created hooks.
+ * @returns The object with typed hooks, ready to be tapped and triggered.
  *
  * @example
- * const hooks = createHooks((h) => ({
- *   onInit: h.sequence<string>(),  // Handles a sequence of async operations
- *   onExit: h.emit<void>(),         // Fires an event without waiting for results
- * }))
+ * import { sequence, emit } from '~core/hooks'
+ * import { createHooks } from '~core/createHooks'
+ *
+ * const hooks = createHooks({
+ *   onInit: sequence<string>(),   // Executes handlers in order
+ *   onExit: emit<void>(),         // Triggers an event with no result
+ * })
  *
  * hooks.onInit.tap(async () => 'ready')
  * hooks.onExit.tap(() => console.log('Exiting...'))
  */
 export function createHooks<
 	Hooks extends Record<string, Hook<(...args: unknown[]) => unknown, unknown>>
->(factory: (builder: HookBuilder) => Hooks): Hooks {
-	const builder = new HookBuilder()
-	return factory(builder)
+>(hooks: Hooks): Hooks {
+	return hooks
 }

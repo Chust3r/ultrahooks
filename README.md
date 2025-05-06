@@ -46,22 +46,6 @@ UltraHooks allows you to define, execute, and extend execution flows through a s
 
 ## 🧭 Hook Declaration
 
-### Declarative (recommended)
-
-```ts
-import { createHooks } from 'ultrahooks'
-
-const hooks = createHooks<AppCtx>((h) => ({
-	onInit: h.sequence(),
-	onPlugins: h.concurrent(),
-	onTransform: h.pipeline<{ input: string }>(),
-	onShouldExit: h.race<boolean>(),
-	onLoad: h.event(),
-}))
-```
-
-### By Object (alternative)
-
 ```ts
 import {
 	sequence,
