@@ -1,0 +1,21 @@
+{
+	"name": "ultrahooks",
+	"version": "0.5.0",
+	"author": "Chust3r",
+	"main": "src/index.ts",
+	"type": "module",
+	"private": true,
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/bun": "^0.1.0",
+		"@types/node": "^22.15.11",
+		"typescript": "^5.8.3"
+	},
+	"peerDependencies": {
+		"typescript": "^5.8.3"
+	},
+	"scripts": {
+		"lint": "biome format",
+		"lint:fix": "biome format --write ."
+	}
+}
