@@ -1,5 +1,12 @@
 {
 	"compilerOptions": {
+		"baseUrl": "src",
+		"paths": {
+			"~core/*": ["core/*"],
+			"~types/*": ["types/*"],
+			"~hooks/*": ["hooks/*"],
+			"~utils/*": ["utils/*"]
+		},
 		"lib": ["esnext"],
 		"target": "ESNext",
 		"module": "ESNext",

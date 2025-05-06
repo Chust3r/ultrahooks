@@ -1,190 +1,139 @@
 # ⚡ UltraHooks
 
-**Sistema de hooks asíncronos, extensibles, tipados y declarativos.** Diseñado para arquitecturas modernas basadas en plugins, flujos reactivos y pipelines dinámicos.
+**An extensible, strongly-typed, asynchronous, and declarative hook system.** Designed for modern architectures based on plugins, reactive flows, and dynamic pipelines.
 
 ---
 
-## 🎯 Objetivo
+## 🎯 Objective
 
-UltraHooks permite definir, ejecutar y extender flujos de ejecución a través de un sistema de **hooks 100% asíncronos**, con soporte para contexto mutable, control de condiciones, prioridades y reactividad opcional.
-
----
-
-## ✅ Características
-
--  ✨ API declarativa con tipado estricto en TypeScript.
--  🔁 Hooks completamente asíncronos.
--  🧠 Contexto mutable, reactivo y tipado.
--  🪝 Múltiples tipos de hooks (async, parallel, waterfall, bail, etc.).
--  🧩 Agnóstico: no depende de ningún framework.
--  🧬 Condicionales y prioridades (`when`, `stage`).
--  🔌 Soporte para plugins y composición avanzada.
--  🧪 Probado y preparado para entornos Node, Bun, Deno y frontend.
+UltraHooks allows you to define, execute, and extend execution flows through a system of **100% asynchronous hooks**, supporting mutable context, condition control, priorities, and optional reactivity.
 
 ---
 
-## 📦 Tecnologías
+## ✅ Features
 
--  [`TypeScript`](https://www.typescriptlang.org/) estricto.
--  Reactividad opcional con [`nanostores`](https://github.com/nanostores/nanostores), [`zustand`](https://github.com/pmndrs/zustand) o personalizado.
--  ESM-first, compatible con Bun, Node.js y navegadores modernos.
+-  ✨ Declarative API with strict TypeScript typing.
+-  🔁 Fully asynchronous hooks.
+-  🧠 Mutable, reactive, and typed context.
+-  🪝 Multiple types of hooks (`sequence`, `concurrent`, `pipeline`, `race`, `event`, etc.).
+-  🧩 Framework-agnostic: does not depend on any particular framework.
+-  🧬 Conditionals and priorities (`when`, `stage`).
+-  🔌 Support for plugins and advanced composition.
+-  🧪 Tested and ready for Node, Bun, Deno, and frontend environments.
+
+---
+
+## 📦 Technologies
+
+-  Strict [`TypeScript`](https://www.typescriptlang.org/).
+-  Optional reactivity with [`nanostores`](https://github.com/nanostores/nanostores), [`zustand`](https://github.com/pmndrs/zustand), or custom solutions.
+-  ESM-first, compatible with Bun, Node.js, and modern browsers.
 
 ---
 
 ## 🚧 Roadmap
 
-| Versión | Descripción                                                                 |
-| ------- | --------------------------------------------------------------------------- |
-| v0.1    | Implementación base: `async`, `parallel`, `waterfall`, `bail`, `event`      |
-| v0.2    | API declarativa con tipado genérico y `ctx` mutable                         |
-| v0.3    | Hooks avanzados: `compose`, `sequence`, `timeout`, `guard`, `race`          |
-| v0.4    | Soporte para `stage`, `when`, introspección, middleware                     |
-| v0.5    | Plugins (`usePlugin`), runtime DSL, fallback hooks                          |
-| Future  | Devtools, visualizador de ejecución, integración con entornos (`vite`, etc) |
+| Version | Description                                                                |
+| ------- | -------------------------------------------------------------------------- |
+| v1.0    | Base implementation: `sequence`, `concurrent`, `pipeline`, `race`, `event` |
+| v1.1    | Declarative API with generic typing and mutable `ctx`                      |
+| v1.2    | Advanced hooks: `compose`, `timeout`, `guard`, `retry`                     |
+| v1.3    | Support for `stage`, `when`, introspection, middleware                     |
+| v1.4    | Plugins (`usePlugin`), runtime DSL, fallback hooks                         |
+| Future  | Devtools, execution visualizer, environment integration (e.g., `vite`)     |
 
 ---
 
-## 🧭 Declaración de Hooks
+## 🧭 Hook Declaration
 
-### Declarativa (recomendada)
+### Declarative (recommended)
 
 ```ts
 import { createHooks } from 'ultrahooks'
 
 const hooks = createHooks<AppCtx>((h) => ({
-	onInit: h.async(),
-	onPlugins: h.parallel(),
-	onTransform: h.waterfall<{ input: string }>(),
-	onShouldExit: h.bail<boolean>(),
+	onInit: h.sequence(),
+	onPlugins: h.concurrent(),
+	onTransform: h.pipeline<{ input: string }>(),
+	onShouldExit: h.race<boolean>(),
 	onLoad: h.event(),
 }))
 ```
 
-## Por objeto (alternativa)
+### By Object (alternative)
 
 ```ts
 import {
-	async,
-	parallel,
-	waterfall,
-	bail,
+	sequence,
+	concurrent,
+	pipeline,
+	race,
 	event,
 	createHooks,
 } from 'ultrahooks'
 
-const hooks = createHooks<AppCtx>({
-	onInit: async(),
-	onPlugins: parallel(),
-	onTransform: waterfall<{ input: string }>(),
-	onShouldExit: bail<boolean>(),
+const hooks = createHooks({
+	onInit: sequence(),
+	onPlugins: concurrent(),
+	onTransform: pipeline<{ input: string }>(),
+	onShouldExit: race<boolean>(),
 	onLoad: event(),
 })
 ```
 
-## 🧠 Tipos de Hooks
+# 🧠 Hook Types
 
-### Básicos
+## Basic Hooks
 
-| Hook        | Método             | Descripción                                                    |
-| ----------- | ------------------ | -------------------------------------------------------------- |
-| `async`     | `h.async()`        | Ejecuta handlers en serie.                                     |
-| `parallel`  | `h.parallel()`     | Ejecuta todos en paralelo.                                     |
-| `waterfall` | `h.waterfall<T>()` | Pasa valor y lo transforma secuencialmente.                    |
-| `bail`      | `h.bail<T>()`      | Retorna el primer resultado no `undefined` y cancela el resto. |
-| `map`       | `h.map<T>()`       | Ejecuta todos y retorna un array con los resultados.           |
-| `event`     | `h.event()`        | Notifica sin retornar resultados.                              |
+| Hook         | Method            | Description                                                                                     |
+| ------------ | ----------------- | ----------------------------------------------------------------------------------------------- |
+| `sequence`   | `h.sequence()`    | Executes handlers sequentially, ensuring each runs one after the other.                         |
+| `concurrent` | `h.concurrent()`  | Executes all handlers in parallel, without waiting for any to finish.                           |
+| `pipeline`   | `h.pipeline<T>()` | Passes a value through a series of transformations, each step modifying the data.               |
+| `race`       | `h.race<T>()`     | Executes all handlers and resolves with the first one to finish successfully.                   |
+| `event`      | `h.event()`       | Notifies listeners without returning any result. Useful for triggering actions or side-effects. |
 
-### Avanzados
+## Advanced Hooks
 
-| Hook       | Método           | Descripción                                           |
-| ---------- | ---------------- | ----------------------------------------------------- |
-| `compose`  | `h.compose<T>()` | Composición encadenada de múltiples hooks.            |
-| `sequence` | `h.sequence()`   | Flujo por etapas con posibilidad de anidar hooks.     |
-| `guard`    | `h.guard(fn)`    | Ejecuta solo si la condición se cumple.               |
-| `timeout`  | `h.timeout(ms)`  | Descarta handlers que superen el tiempo definido.     |
-| `race`     | `h.race<T>()`    | Ejecuta todos y resuelve con el primero en finalizar. |
+| Hook      | Method           | Description                                                                                 |
+| --------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| `compose` | `h.compose<T>()` | Chain multiple hooks together, ensuring their order of execution is maintained.             |
+| `retry`   | `h.retry<T>()`   | Attempts to re-run a handler a specified number of times in case of failure.                |
+| `guard`   | `h.guard(fn)`    | Executes a handler only if a specified condition is true. Useful for conditional execution. |
+| `timeout` | `h.timeout(ms)`  | Cancels a handler if it exceeds the specified time limit.                                   |
+| `batch`   | `h.batch()`      | Groups handlers together, running them in a single batch for more efficient execution.      |
 
 ---
 
-## 🧩 Contexto Mutable & Reactivo
+# 🧪 Execution
+
+````ts
+await hooks.onInit.run()
+
+const transformed = await hooks.onTransform.run({ input: 'hello' })
+
+const shouldExit = await hooks.onShouldExit.run(true)```
+````
+
+## 💡 Use Cases
+
+-  Modular frameworks and plugin-based architectures
+-  Data transformation pipelines (e.g., files, data)
+-  Task automation (e.g., CLI, backend)
+-  Microservices with decoupled logic
+-  Dynamic project extension
+
+---
+
+## 🧬 Final API
 
 ```ts
-type AppCtx = {
-	env: 'dev' | 'prod'
-	config: Store<{ debug: boolean }>
-}
-
-hooks.onInit.use(async (ctx) => {
-	if (ctx.env === 'dev') ctx.config.set({ debug: true })
-})
-```
-
-El `ctx` es completamente tipado y puede incluir objetos reactivos si lo necesitas.
-También puedes usar módulos personalizados para manejar reactividad.
-
-## 🎛️ Prioridad y Condiciones
-
-```ts
-hooks.onInit.use(
-	async (ctx) => {
-		// Handler prioritario
-	},
-	{ stage: 10 }
-)
-
-hooks.onInit.use(
-	async (ctx) => {
-		// Solo si estamos en producción
-	},
-	{ when: (ctx) => ctx.env === 'prod' }
-)
-```
-
-## 🧪 Ejecución
-
-```ts
-await hooks.onInit.run(ctx)
-
-const transformed = await hooks.onTransform.run({ input: 'hola' })
-
-const shouldExit = await hooks.onShouldExit.run(true)
-```
-
-## 💡 Casos de Uso
-
--  Frameworks modulares y basados en plugins
-
--  Pipelines de transformación (archivos, datos)
-
--  Automatización de tareas (CLI, backend)
-
--  Microservicios con lógica desacoplada
-
--  Extensión dinámica de proyectos
-
-## 🧬 API Final (Ejemplo completo)
-
-```ts
-const hooks = createHooks<AppCtx>((hook) => ({
-	onInit: hook.async(),
-	onLoadPlugins: hook.parallel(),
-	onCompile: hook.waterfall<{ code: string }>(),
-	onValidate: hook.bail<boolean>(),
+const hooks = createHooks((hook) => ({
+	onInit: hook.sequence(),
+	onLoadPlugins: hook.concurrent(),
+	onCompile: hook.pipeline<{ code: string }>(),
+	onValidate: hook.race<boolean>(),
 	onCleanup: hook.sequence(),
 	onRun: hook.compose(),
 }))
 ```
-
-## 🧪 Inspiraciones
-
--  Tapable (Webpack)
-
--  Hookable (Nuxt)
-
--  unplugin / vite-plugin
-
--  modern-event-emitter
-
--  RxJS (conceptualmente)
-
--  Astro / Vite plugin APIs
