@@ -1,18 +1,16 @@
-import type { SequenceHookHandler, Hook } from '~types/hooks'
-import { nanoid } from 'nanoid'
+import type { SequenceHookHandler } from "~types/hooks";
+import { BaseHook } from "~hooks/base";
 
 /**
- * The `SequenceHook` class allows you to define a sequence of handlers that
- * are executed in the order they are registered. Each handler executes
- * asynchronously, and the results are collected in sequence.
+ * The `SequenceHook` class allows handlers to be executed one after another,
+ * in the order they were registered. Each handler is awaited before moving to the next.
  *
- * @template T - The type of the result that each handler returns.
+ * @template T - The type of the result returned by each handler.
  */
-export class SequenceHook<T = unknown>
-	implements Hook<SequenceHookHandler<T>, (T | undefined)[]>
-{
-	private handlers: Map<string, SequenceHookHandler<T>> = new Map()
-
+export class SequenceHook<T = unknown> extends BaseHook<
+	SequenceHookHandler<T>,
+	T[]
+> {
 	/**
 	 * Registers a new handler to be part of the sequence.
 	 * Each handler will be executed in the order it was added.
@@ -21,27 +19,24 @@ export class SequenceHook<T = unknown>
 	 * @returns A function that can be called to remove this handler from the sequence.
 	 */
 	public tap(handler: SequenceHookHandler<T>): () => void {
-		const id = nanoid()
-		this.handlers.set(id, handler)
-
-		// Return a function to remove the handler later if needed
-		return () => this.handlers.delete(id)
+		const id = this.generateId();
+		this.handlers.set(id, handler);
+		return () => this.handlers.delete(id);
 	}
 
 	/**
 	 * Runs all the registered handlers in sequence. Each handler is awaited in order.
 	 *
-	 * @returns A promise that resolves with an array of the results
-	 * from each handler in the sequence.
+	 * @returns A promise that resolves with an array of the results from each handler.
 	 */
-	public async trigger(): Promise<(T | undefined)[]> {
-		const results: (T | undefined)[] = []
+	public async trigger(): Promise<T[]> {
+		const results: T[] = [];
 
 		for (const handler of this.handlers.values()) {
-			const result = await handler()
-			results.push(result)
+			const result = await handler();
+			results.push(result);
 		}
 
-		return results
+		return results;
 	}
 }

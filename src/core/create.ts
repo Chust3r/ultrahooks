@@ -1,4 +1,4 @@
-import type { Hook } from '~types/hooks'
+import type { Hook } from "~types/hooks";
 
 /**
  * Creates a collection of typed plugin hooks using a declarative factory pattern.
@@ -25,7 +25,7 @@ import type { Hook } from '~types/hooks'
  * hooks.onExit.tap(() => console.log('Exiting...'))
  */
 export function createHooks<
-	Hooks extends Record<string, Hook<(...args: unknown[]) => unknown, unknown>>
+	Hooks extends Record<string, Hook<(...args: any[]) => unknown, unknown>>,
 >(hooks: Hooks): Hooks {
-	return hooks
+	return hooks;
 }
